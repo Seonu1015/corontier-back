@@ -175,7 +175,7 @@ router.post('/insert/solution', function (req, res) {
     });
 });
 
-// 풀이 리스트 - 사용자
+// 풀이 리스트 - 사용자 기준
 router.get('/sol.json/:user_id', function (req, res) {
     const user_id = req.params.user_id;
     const page = req.query.page;
@@ -229,17 +229,24 @@ router.post('/sol_cmnt/delete', function(req, res) {
 });
 
 // 풀이 제출 여부 확인 - 다른 사람 풀이 볼 수 있는지 체크
-router.get('/submit', function (req, res) {
-    const problem_id = req.body.problem_id;
-    const user_id = req.body.user_id;
+router.get('/submit/list.json', function (req, res) {
+    const user_id = req.query.user_id;
+    const problem_id = req.query.problem_id;
 
-    const sql = 'select * from solution where problem_id = ? and user_id = ?';
+    const sql = 'select count(*) submitcnt from solutions where problem_id = ? and user_id = ?';
     db.get().query(sql, [problem_id, user_id], function (err, rows) {
-        if (rows.length > 0) {
-            res.send('1'); // 사용자가 문제를 풀어서 등록했던 경우
-        } else {
-            res.send('0'); // 사용자가 문제를 푼 적이 없는 경우
-        }
+        res.send(rows[0]);
+    });
+});
+
+// 풀이 리스트 - 문제 기준
+router.get('/others/list.json', function(req, res) {
+    const problem_id = req.query.problem_id;
+    const page = req.query.page || 1;
+    const size = req.query.size || 5;
+    const sql = 'call solution_list(?, ?, ?)';
+    db.get().query(sql, [problem_id, page, size], function(err, rows) {
+        res.send({list:rows[0], total:rows[1][0].total});
     });
 });
 
@@ -249,6 +256,46 @@ router.get('/clear/:user_id', function(req, res) {
     const sql = 'call user_clear_data(?)';
     db.get().query(sql, [user_id], function(err, rows) {
         res.send({list:rows[0], user:rows[1][0], clearcnt:rows[2][0]});
+    });
+});
+
+// 북마크 여부
+router.get('/bookmarkox/list.json', function(req, res) {
+    const user_id = req.query.user_id;
+    const problem_id = req.query.problem_id;
+    const sql = 'select count(*) bookmark from bookmarks_problem where user_id=? and problem_id=?';
+    db.get().query(sql, [user_id, problem_id], function(err, rows) {
+        res.send(rows[0])
+    });
+});
+
+// 북마크 추가
+router.post('/bookmark/insert', function(req, res) {
+    const user_id = req.body.user_id;
+    const problem_id = req.body.problem_id;
+
+    const sql = 'insert into bookmarks_problem(user_id, problem_id) values(?, ?)';
+    db.get().query(sql, [user_id, problem_id], function(err) {
+        if (err) {
+            res.send('0');
+        } else {
+            res.send('1');
+        }
+    });
+});
+
+// 북마크 삭제
+router.post('/bookmark/delete', function(req, res) {
+    const user_id = req.body.user_id;
+    const problem_id = req.body.problem_id;
+
+    const sql = 'delete from bookmarks_problem where user_id=? and problem_id=?';
+    db.get().query(sql, [user_id, problem_id], function(err) {
+        if (err) {
+            res.send('0');
+        } else {
+            res.send('1');
+        }
     });
 });
 
