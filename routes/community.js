@@ -32,7 +32,7 @@ router.get('/notice/:post_id',function(req, res){ //localhost:5000/community/not
     const sql='select * from posts where post_id=?';
     db.get().query(sql, [post_id], function(err, rows){
         res.send(rows);
-        console.log(rows);
+        // console.log(rows);
     });
 });
 
@@ -80,7 +80,7 @@ router.get('/lounge/:post_id', function(req, res){// localhost:5000/community/lo
     const sql='SELECT p.*, u.nickname, date_format(p.created_at, "%Y.%m.%d %T") fmtdate FROM posts p,users u where p.user_id = u.user_id and p.menu = 3 and post_id=?;'
     db.get().query(sql, [post_id],function(err, rows){
         res.send(rows);
-        console.log(rows)
+        // console.log(rows)
     })
 });
 
@@ -97,7 +97,7 @@ router.get('/applystudy&project/:post_id', function(req, res){// localhost:5000/
     const sql='SELECT p.*, u.nickname, date_format(p.created_at, "%Y.%m.%d %T") fmtdate FROM posts p,users u where p.user_id = u.user_id and p.menu = 4 and post_id=?;'
     db.get().query(sql, [post_id],function(err, rows){
         res.send(rows);
-        console.log(rows)
+        // console.log(rows)
     })
 });
 
@@ -114,7 +114,7 @@ router.get('/q&a/:post_id', function(req, res){// localhost:5000/community/q&a/5
     const sql='SELECT p.*, u.nickname, date_format(p.created_at, "%Y.%m.%d %T") fmtdate FROM posts p,users u where p.user_id = u.user_id and p.menu = 5 and post_id=?;'
     db.get().query(sql, [post_id],function(err, rows){
         res.send(rows);
-        console.log(rows)
+        // console.log(rows)
     })
 });
 
