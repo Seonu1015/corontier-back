@@ -47,19 +47,19 @@ router.post('/kakaologininsert', function (req, res) {
 
 
 router.post('/login', function (req, res) {
-    console.log("1번")
+    // console.log("1번")
     const email = req.body.email;
     const Upassword = req.body.Upassword;
 
-    console.log(email)
-    console.log(Upassword)
+    // console.log(email)
+    // console.log(Upassword)
     const sql = 'select * from users where email=?';
-    console.log("2번")
+    // console.log("2번")
    db.get().query(sql, [email], function (err, rows) {
-    console.log("3번")
+    // console.log("3번")
         if(rows.length > 0) {
             if(rows[0].password == Upassword){
-              console.log(rows)
+              // console.log(rows)
                res.send( {'result':'1','user_id':rows[0].user_id});
             }else{
             res.send({'result':'2'});
@@ -69,8 +69,8 @@ router.post('/login', function (req, res) {
        }
   });
 
-  console.log("4번")
- console.log("로그인시도")
+//   console.log("4번")
+//  console.log("로그인시도")
 });
 
 router.post('/insert', function(req, res){
@@ -79,7 +79,7 @@ router.post('/insert', function(req, res){
   const nickname=req.body.nickname;
   const Upassword=req.body.Upassword;
 
-  console.log(email, nickname, Upassword);
+  // console.log(email, nickname, Upassword);
 
   const sql='insert into users(email,nickname,password) values(?,?,?)';
   db.get().query(sql, [email,nickname,Upassword], function (err, rows) {
