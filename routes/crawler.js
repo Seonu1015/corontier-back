@@ -746,7 +746,7 @@ function search(keywords) {
 
 /*
 
-  const OPENAI_API_KEY = "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";
+  const OPENAI_API_KEY = "---";
   
   async function callChatGPT(prompt) {
     const configuration = {
@@ -776,7 +776,18 @@ function search(keywords) {
 
 */
 
-
+router.get('/javalist/:vod_id', async(req, res) => { 
+    const vod_id=req.params.vod_id;
+    const sql = 'select * from javayoutubedata where vod_id=?';
+    db.get().query(sql,[vod_id], async function(err, rows) {
+        if (err) {
+            console.log(err);
+            res.status(500).send('Server Error');
+            return;
+          }
+          res.send({rows });
+        });      
+});
 
 
 
