@@ -171,7 +171,7 @@ minjiscrape("자바")
 
 
 
-*/
+
 
 
 
@@ -250,6 +250,10 @@ async function crawleringchecker() {
 
 crawleringchecker();
 
+*/
+
+
+
 
 
 
@@ -265,6 +269,73 @@ router.get('/list.json', async(req, res) => {
         })
     
 });
+
+
+router.get('/javalist.json', async(req, res) => {
+  
+    const sql = 'SELECT * FROM javayoutubedata';
+
+    db.get().query(sql, async function(err, rows) {
+      
+            res.send({ list: rows });
+        })
+    
+});
+
+router.get('/javalist/:vod_id', async(req, res) => { 
+    const vod_id=req.params.vod_id;
+    const sql = 'select * from javayoutubedata where vod_id=?';
+    db.get().query(sql,[vod_id], async function(err, rows) {
+        if (err) {
+            console.log(err);
+            res.status(500).send('Server Error');
+            return;
+          }
+          res.send(rows[0]);
+        });      
+});
+
+
+router.get('/javascriptlist.json', async(req, res) => {
+  
+    const sql = 'SELECT * FROM javascriptyoutubedata';
+
+    db.get().query(sql, async function(err, rows) {
+      
+            res.send({ list: rows });
+        })
+    
+});
+
+
+
+
+router.get('/phytonyoutubedatalist.json', async(req, res) => {
+  
+    const sql = 'SELECT * FROM phytonyoutubedata';
+
+    db.get().query(sql, async function(err, rows) {
+      
+            res.send({ list: rows });
+        })
+    
+});
+
+
+
+router.get('/reactyoutubedatalist.json', async(req, res) => {
+  
+    const sql = 'SELECT * FROM reactyoutubedata';
+
+    db.get().query(sql, async function(err, rows) {
+      
+            res.send({ list: rows });
+        })
+    
+});
+
+
+
 
 
 module.exports = router;
