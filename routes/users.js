@@ -47,19 +47,19 @@ router.post('/kakaologininsert', function (req, res) {
 
 
 router.post('/login', function (req, res) {
-    console.log("1번")
+    // console.log("1번")
     const email = req.body.email;
     const Upassword = req.body.Upassword;
 
-    console.log(email)
-    console.log(Upassword)
+    // console.log(email)
+    // console.log(Upassword)
     const sql = 'select * from users where email=?';
-    console.log("2번")
+    // console.log("2번")
    db.get().query(sql, [email], function (err, rows) {
-    console.log("3번")
+    // console.log("3번")
         if(rows.length > 0) {
             if(rows[0].password == Upassword){
-              console.log(rows)
+              // console.log(rows)
                res.send( {'result':'1','user_id':rows[0].user_id});
             }else{
             res.send({'result':'2'});
@@ -69,8 +69,8 @@ router.post('/login', function (req, res) {
        }
   });
 
-  console.log("4번")
- console.log("로그인시도")
+//   console.log("4번")
+//  console.log("로그인시도")
 });
 
 router.post('/insert', function(req, res){
@@ -79,7 +79,7 @@ router.post('/insert', function(req, res){
   const nickname=req.body.nickname;
   const Upassword=req.body.Upassword;
 
-  console.log(email, nickname, Upassword);
+  // console.log(email, nickname, Upassword);
 
   const sql='insert into users(email,nickname,password) values(?,?,?)';
   db.get().query(sql, [email,nickname,Upassword], function (err, rows) {
@@ -110,8 +110,15 @@ router.get('/read/:user_id',function(req,res){
   const user_id = req.params.user_id;
   const sql = "select * from users where user_id = ?";
   db.get().query(sql,[user_id],function(err,rows){
-    if(err) console.log(err);
-    res.send(rows[0]);
+    if (err) {
+      console.log("user정보 db조회 에러: ", err);
+      res.status(500).send({ error: "데이터를 불러오는 중 오류가 발생했습니다." });
+    } else if (rows.length === 0) {
+      console.log('user정보 db 결과없음');
+      res.send('0');
+    } else {
+      res.send(rows[0]);
+    }
   })
 });  
 //사용자정보 수정
@@ -198,7 +205,22 @@ router.get('/getproblemlanguagecount/:user_id', function(req, res) {
 
 
 
+router.get('/solvecountlist.json/:user_id', function(req, res) {
+  const user_id = req.params.user_id; // 쿼리 스트링에서 user_id 추출
 
+  // user_id를 사용하는 SQL 쿼리 작성
+  const sql = `SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as day, COUNT(*) as value FROM solutions WHERE user_id = ? GROUP BY DATE_FORMAT(created_at, '%Y-%m-%d') ORDER BY day;`;
+
+  // SQL 쿼리 실행
+  db.get().query(sql, [user_id], function(err, rows) {
+    if (err) {
+      console.log(err);
+      res.status(500).send('Server Error');
+      return;
+    }
+    res.send({ list: rows });
+  });
+});
 
 
 

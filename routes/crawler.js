@@ -4,6 +4,8 @@ const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 var db = require('../db');
 const bodyParser = require('body-parser');
+const axios = require('axios');
+const { Configuration, OpenAIApi } = require('openai');
 
 router.get('/', function(req, res, next) {
         console.log("실행됨?")
@@ -169,13 +171,348 @@ async function minjiscrape(query) {
 
 minjiscrape("자바")
 
+*/
+
+const YOUTUBE_API_URL = 'https://www.googleapis.com/youtube/v3/search';
+const API_KEY = 'AIzaSyAa9i98npXTpi3pBV8nywuAQroei9WTzTA';
+const searchYouTube = async (query, apiKey) => {
+    try {
+      const response = await axios.get(YOUTUBE_API_URL, {
+        params: {
+          part: 'snippet',
+          maxResults: 10, // 필요한 결과 개수
+          q: query,
+          key: apiKey,
+        }
+      });
+  
+      // 결과에서 필요한 정보를 추출하고 URL을 추가
+      const searchList = response.data.items.reduce((acc, item) => {
+    
+        let url = null;
+        if (item.id.videoId) {
+          url = `https://www.youtube.com/embed/${item.id.videoId}`;
+        } else if (item.id.playlistId) {
+          url = `https://www.youtube.com/embed/videoseries?list=${item.id.playlistId}`;
+        }
+  
+        if (url && item.snippet.description) {
+            acc.push({
+              title: item.snippet.title,
+              url: url,
+              contents: item.snippet.description
+            });
+          }
+  
+        return acc;
+      }, []);
+
+
+      console.log(searchList)
+
+      const sql = 'SELECT * FROM javayoutubedata';
+          db.get().query(sql, async function(err, rows) {
+                  if (err) {
+                             console.error('데이터 조회 오류:', err);
+                             
+                  } else {
+                                  for (let item of searchList) {
+                                          const vod_title = item.title;
+                                          const vod_contents = item.contents
+
+                                            // 데이터베이스에서 해당 title이 이미 존재하는지 확인합니다.
+                                             const exists = rows.some(row => row.vod_title === vod_title);
+                                             console.log("중복체크중") 
+                                             if (!exists) {
+                                                 console.log("중복아님")
+                                                 const vod_link = item.url;
+                                                 const sql2 = 'INSERT INTO javayoutubedata (vod_title, vod_contents, vod_link) VALUES (?, ?, ?)';    
+                                                    db.get().query(sql2, [vod_title, vod_contents, vod_link], function(err, insertResult) {
+                                                       if (err) {
+                                                                 console.error('데이터 삽입 오류:', err);
+                                                   // 삽입 오류시 추가적인 처리가 필요하면 여기에 추가합니다.
+                                                       } else {
+                                                        // 삽입에 성공했을 때의 추가적인 처리가 필요하면 여기에 추가합니다.
+                                                                 console.log("삽입성공?")
+                                                             
+                                                   }
+                                               });
+
+                                            }
+            }
+                                            
+                                            }
+                                           
+        }
+    )
+
+
+
+
+      return searchList;
+     
+    } catch (error) {
+      console.error('Error fetching YouTube search results:', error);
+      return [];
+    }
+  };
+  
+ 
+
+
+const searchYouTubeJAVASCRIPT = async (query, apiKey) => {
+    try {
+        const response = await axios.get(YOUTUBE_API_URL, {
+          params: {
+            part: 'snippet',
+            maxResults: 10, // 필요한 결과 개수
+            q: query,
+            key: apiKey,
+          }
+        });
+    
+        // 결과에서 필요한 정보를 추출하고 URL을 추가
+        const searchList = response.data.items.reduce((acc, item) => {
+      
+          let url = null;
+          if (item.id.videoId) {
+            url = `https://www.youtube.com/embed/${item.id.videoId}`;
+          } else if (item.id.playlistId) {
+            url = `https://www.youtube.com/embed/videoseries?list=${item.id.playlistId}`;
+          }
+    
+          if (url && item.snippet.description) {
+              acc.push({
+                title: item.snippet.title,
+                url: url,
+                contents: item.snippet.description
+              });
+            }
+    
+          return acc;
+        }, []);
+  
+  
+        console.log(searchList)
+  
+        const sql = 'SELECT * FROM javascriptyoutubedata';
+            db.get().query(sql, async function(err, rows) {
+                    if (err) {
+                               console.error('데이터 조회 오류:', err);
+                               
+                    } else {
+                                    for (let item of searchList) {
+                                            const vod_title = item.title;
+                                            const vod_contents = item.contents
+  
+                                              // 데이터베이스에서 해당 title이 이미 존재하는지 확인합니다.
+                                               const exists = rows.some(row => row.vod_title === vod_title);
+                                               console.log("중복체크중") 
+                                               if (!exists) {
+                                                   console.log("중복아님")
+                                                   const vod_link = item.url;
+                                                   const sql2 = 'INSERT INTO javascriptyoutubedata (vod_title, vod_contents, vod_link) VALUES (?, ?, ?)';    
+                                                      db.get().query(sql2, [vod_title, vod_contents, vod_link], function(err, insertResult) {
+                                                         if (err) {
+                                                                   console.error('데이터 삽입 오류:', err);
+                                                     // 삽입 오류시 추가적인 처리가 필요하면 여기에 추가합니다.
+                                                         } else {
+                                                          // 삽입에 성공했을 때의 추가적인 처리가 필요하면 여기에 추가합니다.
+                                                                   console.log("삽입성공?")
+                                                               
+                                                     }
+                                                 });
+  
+                                              }
+              }
+                                              
+                                              }
+                                             
+          }
+      )
+  
+
+
+      return searchList;
+     
+    } catch (error) {
+      console.error('Error fetching YouTube search results:', error);
+      return [];
+    }
+  };
+
+
+  const searchYouTubephyton = async (query, apiKey) => {
+    try {
+        const response = await axios.get(YOUTUBE_API_URL, {
+          params: {
+            part: 'snippet',
+            maxResults: 10, // 필요한 결과 개수
+            q: query,
+            key: apiKey,
+          }
+        });
+    
+        // 결과에서 필요한 정보를 추출하고 URL을 추가
+        const searchList = response.data.items.reduce((acc, item) => {
+      
+          let url = null;
+          if (item.id.videoId) {
+            url = `https://www.youtube.com/embed/${item.id.videoId}`;
+          } else if (item.id.playlistId) {
+            url = `https://www.youtube.com/embed/videoseries?list=${item.id.playlistId}`;
+          }
+    
+          if (url && item.snippet.description) {
+              acc.push({
+                title: item.snippet.title,
+                url: url,
+                contents: item.snippet.description
+              });
+            }
+    
+          return acc;
+        }, []);
+  
+  
+        console.log(searchList)
+  
+        const sql = 'SELECT * FROM phytonyoutubedata';
+            db.get().query(sql, async function(err, rows) {
+                    if (err) {
+                               console.error('데이터 조회 오류:', err);
+                               
+                    } else {
+                                    for (let item of searchList) {
+                                            const vod_title = item.title;
+                                            const vod_contents = item.contents
+  
+                                              // 데이터베이스에서 해당 title이 이미 존재하는지 확인합니다.
+                                               const exists = rows.some(row => row.vod_title === vod_title);
+                                               console.log("중복체크중") 
+                                               if (!exists) {
+                                                   console.log("중복아님")
+                                                   const vod_link = item.url;
+                                                   const sql2 = 'INSERT INTO phytonyoutubedata (vod_title, vod_contents, vod_link) VALUES (?, ?, ?)';    
+                                                      db.get().query(sql2, [vod_title, vod_contents, vod_link], function(err, insertResult) {
+                                                         if (err) {
+                                                                   console.error('데이터 삽입 오류:', err);
+                                                     // 삽입 오류시 추가적인 처리가 필요하면 여기에 추가합니다.
+                                                         } else {
+                                                          // 삽입에 성공했을 때의 추가적인 처리가 필요하면 여기에 추가합니다.
+                                                                   console.log("삽입성공?")
+                                                               
+                                                     }
+                                                 });
+  
+                                              }
+              }
+                                              
+                                              }
+                                             
+          }
+      )
+  
 
 
 
 
 
+      return searchList;
+     
+    } catch (error) {
+      console.error('Error fetching YouTube search results:', error);
+      return [];
+    }
+  };
 
 
+
+
+
+  const searchYouTubereact = async (query, apiKey) => {
+    try {
+        const response = await axios.get(YOUTUBE_API_URL, {
+          params: {
+            part: 'snippet',
+            maxResults: 10, // 필요한 결과 개수
+            q: query,
+            key: apiKey,
+          }
+        });
+    
+        // 결과에서 필요한 정보를 추출하고 URL을 추가
+        const searchList = response.data.items.reduce((acc, item) => {
+      
+          let url = null;
+          if (item.id.videoId) {
+            url = `https://www.youtube.com/embed/${item.id.videoId}`;
+          } else if (item.id.playlistId) {
+            url = `https://www.youtube.com/embed/videoseries?list=${item.id.playlistId}`;
+          }
+    
+          if (url && item.snippet.description) {
+              acc.push({
+                title: item.snippet.title,
+                url: url,
+                contents: item.snippet.description
+              });
+            }
+    
+          return acc;
+        }, []);
+  
+  
+        console.log(searchList)
+  
+        const sql = 'SELECT * FROM reactyoutubedata';
+            db.get().query(sql, async function(err, rows) {
+                    if (err) {
+                               console.error('데이터 조회 오류:', err);
+                               
+                    } else {
+                                    for (let item of searchList) {
+                                            const vod_title = item.title;
+                                            const vod_contents = item.contents
+  
+                                              // 데이터베이스에서 해당 title이 이미 존재하는지 확인합니다.
+                                               const exists = rows.some(row => row.vod_title === vod_title);
+                                               console.log("중복체크중") 
+                                               if (!exists) {
+                                                   console.log("중복아님")
+                                                   const vod_link = item.url;
+                                                   const sql2 = 'INSERT INTO reactyoutubedata (vod_title, vod_contents, vod_link) VALUES (?, ?, ?)';    
+                                                      db.get().query(sql2, [vod_title, vod_contents, vod_link], function(err, insertResult) {
+                                                         if (err) {
+                                                                   console.error('데이터 삽입 오류:', err);
+                                                     // 삽입 오류시 추가적인 처리가 필요하면 여기에 추가합니다.
+                                                         } else {
+                                                          // 삽입에 성공했을 때의 추가적인 처리가 필요하면 여기에 추가합니다.
+                                                                   console.log("삽입성공?")
+                                                               
+                                                     }
+                                                 });
+  
+                                              }
+              }
+                                              
+                                              }
+                                             
+          }
+      )
+  
+
+
+
+
+
+      return searchList;
+     
+    } catch (error) {
+      console.error('Error fetching YouTube search results:', error);
+      return [];
+    }
+  };
 
 
 
@@ -249,12 +586,17 @@ async function crawleringchecker() {
 }
 
 crawleringchecker();
+searchYouTube('자바', API_KEY)
+ 
+.catch(error => console.error(error));
 
-*/
+searchYouTubephyton('파이썬', API_KEY)
+ 
+.catch(error => console.error(error));
 
-
-
-
+searchYouTubereact('리액트', API_KEY)
+ 
+.catch(error => console.error(error));
 
 
 
@@ -333,9 +675,6 @@ router.get('/reactyoutubedatalist.json', async(req, res) => {
         })
     
 });
-
-
-
 
 
 module.exports = router;
