@@ -110,8 +110,15 @@ router.get('/read/:user_id',function(req,res){
   const user_id = req.params.user_id;
   const sql = "select * from users where user_id = ?";
   db.get().query(sql,[user_id],function(err,rows){
-    if(err) console.log(err);
-    res.send(rows[0]);
+    if (err) {
+      console.log("user정보 db조회 에러: ", err);
+      res.status(500).send({ error: "데이터를 불러오는 중 오류가 발생했습니다." });
+    } else if (rows.length === 0) {
+      console.log('user정보 db 결과없음');
+      res.send('0');
+    } else {
+      res.send(rows[0]);
+    }
   })
 });  
 //사용자정보 수정
