@@ -299,4 +299,13 @@ router.post('/bookmark/delete', function(req, res) {
     });
 });
 
+// 스타터 플랜 list
+router.get('/plan/list.json', function(req, res) {
+    const plan_id = req.query.plan_id;
+    const sql = 'select * from problems where plan_id = ?';
+    db.get().query(sql, [plan_id], function(err, rows) {
+        res.send(rows);
+    });
+});
+
 module.exports = router;
