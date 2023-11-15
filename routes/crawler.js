@@ -176,7 +176,7 @@ minjiscrape("자바")
 
 
 const YOUTUBE_API_URL = 'https://www.googleapis.com/youtube/v3/search';
-const API_KEY = 'AIzaSyAa9i98npXTpi3pBV8nywuAQroei9WTzTA';
+const API_KEY = 'YOUR_API_KEY';
 const searchYouTube = async (query, apiKey) => {
     try {
       const response = await axios.get(YOUTUBE_API_URL, {
