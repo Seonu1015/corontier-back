@@ -115,8 +115,6 @@ router.get('/q&a/:post_id', function(req, res){// localhost:5000/community/q&a/5
     db.get().query(sql, [post_id],function(err, rows){
         res.send(rows);
         // console.log(rows)
-<<<<<<< HEAD
-=======
     })
 });
 
@@ -135,7 +133,6 @@ router.get('/textbookpage/:post_id', function(req, res){// localhost:5000/commun
     db.get().query(sql, [post_id],function(err, rows){
         res.send(rows);
         console.log(rows)
->>>>>>> develop
     })
 });
 
