@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "@nivo/calendar": "^0.83.1",
     "@toast-ui/react-editor": "^3.2.3",
     "axios": "^1.6.0",
     "body-parser": "^1.20.2",
