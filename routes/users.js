@@ -205,7 +205,22 @@ router.get('/getproblemlanguagecount/:user_id', function(req, res) {
 
 
 
+router.get('/solvecountlist.json/:user_id', function(req, res) {
+  const user_id = req.params.user_id; // 쿼리 스트링에서 user_id 추출
 
+  // user_id를 사용하는 SQL 쿼리 작성
+  const sql = `SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as day, COUNT(*) as value FROM solutions WHERE user_id = ? GROUP BY DATE_FORMAT(created_at, '%Y-%m-%d') ORDER BY day;`;
+
+  // SQL 쿼리 실행
+  db.get().query(sql, [user_id], function(err, rows) {
+    if (err) {
+      console.log(err);
+      res.status(500).send('Server Error');
+      return;
+    }
+    res.send({ list: rows });
+  });
+});
 
 
 
